@@ -26,7 +26,6 @@ if (playlist == null) {
     <title>View Playlist - MyMusicStore</title>
     <link rel="stylesheet" href="css/profile.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
-    <!-- Replace problematic FontAwesome with a CDN version that works -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         .playlist-section {
@@ -76,13 +75,8 @@ if (playlist == null) {
         audio {
             width: 100%;
         }
-        .search-container {
+        .add-song-container {
             margin: 20px 0;
-        }
-        #songSearch {
-            padding: 8px;
-            width: 100%;
-            margin-bottom: 10px;
         }
         #songDropdown {
             padding: 8px;
@@ -108,16 +102,6 @@ if (playlist == null) {
             padding: 8px 15px;
             cursor: pointer;
             border-radius: 4px;
-        }
-        /* Debug info panel */
-        .debug-info {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            display: none; /* Hidden by default */
         }
     </style>
 </head>
@@ -150,7 +134,6 @@ if (playlist == null) {
     <div class="song-list">
         <% if (songs != null && !songs.isEmpty()) {
             for (Song song : songs) { 
-                // Get filename from song title for audio path
                 String filename = createFilename(song.getTitle());
             %>
                 <div class="song-item" data-song-id="<%= song.getId() %>" data-filename="<%= filename %>">
@@ -179,20 +162,16 @@ if (playlist == null) {
 
     <!-- Add Song to Playlist -->
     <h3>Add Song to Playlist</h3>
-    <div class="search-container">
+    <div class="add-song-container">
         <form action="playlists" method="post" id="addSongForm">
             <input type="hidden" name="action" value="addSong">
             <input type="hidden" name="playlistId" value="<%= playlist.getId() %>">
             
-            <label for="songSearch">Search Songs:</label>
-            <input type="text" id="songSearch" placeholder="Search by title or artist" onkeyup="filterSongs()">
-            
             <% if (allSongs != null && !allSongs.isEmpty()) { %>
-                <label for="songId">Select Song:</label>
+                <label for="songDropdown">Select Song:</label>
                 <select name="songId" id="songDropdown" required>
                     <option value="">-- Select a song --</option>
                     <% for (Song song : allSongs) { 
-                        // Get filename from song title for audio path
                         String filename = createFilename(song.getTitle());
                     %>
                         <option value="<%= song.getId() %>" 
@@ -212,10 +191,6 @@ if (playlist == null) {
             <% } %>
         </form>
     </div>
-    
-    <!-- Debug panel - can be toggled for troubleshooting -->
-    <div class="debug-info" id="debugPanel"></div>
-    <button onclick="toggleDebug()" style="margin-top: 20px;">Toggle Debug Info</button>
 </section>
 
 <!-- Footer -->
@@ -224,48 +199,25 @@ if (playlist == null) {
 </footer>
 
 <script>
-    // Debug logging helper functions
-    const debugPanel = document.getElementById('debugPanel');
-    function debugLog(message) {
-        console.log(message);
-        debugPanel.innerHTML += message + '<br>';
-    }
-    
-    function toggleDebug() {
-        const panel = document.getElementById('debugPanel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    }
-    
-    // Log initial state
-    debugLog("Script loaded - Playlist page");
-    
     // Get references to HTML elements
     const audioPlayer = document.getElementById('audioPlayer');
     const nowPlaying = document.getElementById('nowPlaying');
-    const songSearch = document.getElementById('songSearch');
     const songDropdown = document.getElementById('songDropdown');
     
     // Function to play a song
     function playSong(songId, title, artist, filename) {
-        debugLog(`Playing song: ${title} by ${artist} (ID: ${songId}, File: ${filename})`);
-        
         // Update the now playing text
         nowPlaying.textContent = `${title} - ${artist}`;
         
         // Try multiple paths - adjust these based on your actual file system structure
         const possiblePaths = [
-            // First try the uploads folder using the filename from the data attribute
             `uploads/${filename}`,
-            // Then try specific filenames we know exist (from your project structure)
             `uploads/bohemian_rhapsody.mp3`,
             `uploads/billie_jean.mp3`,
-            // Try some alternative paths
             `/uploads/${filename}`,
             `audio/${filename}`,
             `songs/${filename}`
         ];
-        
-        debugLog("Will try these paths: " + JSON.stringify(possiblePaths));
         
         // Try each path until one works
         tryPath(0);
@@ -273,30 +225,25 @@ if (playlist == null) {
         function tryPath(index) {
             if (index >= possiblePaths.length) {
                 // We've tried all paths and none worked
-                debugLog("ERROR: Could not find audio file in any of the attempted paths");
                 alert("Could not find the audio file. Please check the file paths.");
                 return;
             }
             
             const path = possiblePaths[index];
-            debugLog(`Trying path: ${path}`);
             
             // Create a new Audio element to test if the file exists
             const testAudio = new Audio(path);
             
             testAudio.oncanplaythrough = function() {
-                debugLog(`SUCCESS: Found audio at path: ${path}`);
                 // This path works, set it on the main audio player
                 audioPlayer.src = path;
                 audioPlayer.load();
                 audioPlayer.play().catch(e => {
-                    debugLog("Autoplay prevented: " + e.message);
                     alert("Couldn't play the audio. This might be due to browser autoplay restrictions. Please click play manually.");
                 });
             };
             
             testAudio.onerror = function() {
-                debugLog(`Path failed: ${path}`);
                 // Try the next path
                 tryPath(index + 1);
             };
@@ -306,43 +253,8 @@ if (playlist == null) {
         }
     }
     
-    // Function to filter songs in dropdown
-    function filterSongs() {
-        const searchText = songSearch.value.toLowerCase();
-        debugLog(`Filtering songs with text: "${searchText}"`);
-        
-        const options = songDropdown.options;
-        let visibleOptions = 0;
-        
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value === "") continue; // Skip placeholder option
-            
-            const songText = options[i].text.toLowerCase();
-            if (songText.includes(searchText)) {
-                options[i].style.display = "";
-                visibleOptions++;
-            } else {
-                options[i].style.display = "none";
-            }
-        }
-        
-        debugLog(`Found ${visibleOptions} matching songs`);
-        
-        // Select first matching option if there are results
-        if (visibleOptions > 0 && searchText.length > 0) {
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].style.display !== "none" && options[i].value !== "") {
-                    songDropdown.selectedIndex = i;
-                    break;
-                }
-            }
-        }
-    }
-    
     // Function to add song and play it
     function addAndPlay() {
-        debugLog("Add and play button clicked");
-        
         if (songDropdown.value === "") {
             alert("Please select a song first");
             return;
@@ -354,8 +266,6 @@ if (playlist == null) {
         const title = selectedOption.getAttribute('data-title');
         const artist = selectedOption.getAttribute('data-artist');
         const filename = selectedOption.getAttribute('data-filename');
-        
-        debugLog(`Adding and playing: ${title} by ${artist} (ID: ${songId}, File: ${filename})`);
         
         // Store song info to play after redirect
         localStorage.setItem('playAfterAdd', JSON.stringify({
@@ -371,25 +281,21 @@ if (playlist == null) {
     
     // Check if we should play a song after page load (after adding a song)
     window.onload = function() {
-        debugLog("Window loaded");
-        
         // Check for saved song to play
         const savedSong = localStorage.getItem('playAfterAdd');
         if (savedSong) {
-            debugLog("Found saved song to play: " + savedSong);
             try {
                 const songData = JSON.parse(savedSong);
                 playSong(songData.songId, songData.title, songData.artist, songData.filename);
                 localStorage.removeItem('playAfterAdd');
             } catch (e) {
-                debugLog("Error playing saved song: " + e.message);
+                console.error("Error playing saved song:", e);
             }
         }
         
-        // Test playing a song directly if we have songs in the playlist
+        // Play first song if available and no saved song to play
         const songItems = document.querySelectorAll('.song-item');
         if (songItems.length > 0 && !savedSong) {
-            debugLog("Testing playback with first song in playlist");
             // Delay a bit to allow DOM to fully load
             setTimeout(() => {
                 const firstSong = songItems[0];
