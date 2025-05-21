@@ -1,0 +1,113 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    background-color: #f4f2f7; /* soft off-white background */
+    color: #333333; /* dark text for readability */
+    font-family: 'Montserrat', sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #eae6f0; /* light purple-gray */
+    padding: 15px 30px;
+}
+
+.nav-logo {
+    font-size: 24px;
+    font-weight: 600;
+    color:  #978aab;
+}
+
+.nav-user {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.user-name {
+    font-size: 16px;
+    color: #333333;
+}
+
+.logout-button {
+    color: #A357CA;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.profile-header {
+    padding: 50px;
+    background: linear-gradient(to bottom, #756391 0%, #f4f2f7 100%);
+    display: flex;
+    align-items: center;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #6c59b0;
+}
+
+.username {
+    margin: 0;
+    font-size: 36px;
+    font-weight: 600;
+    color: #463d54;
+}
+
+.user-role {
+    font-size: 14px;
+    color: #666666;
+}
+
+.library {
+    padding: 40px;
+}
+
+.library h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #A357CA;
+}
+
+.playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.playlist-card {
+    background-color: #f0eef5; /* light card background */
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.playlist-card:hover {
+    background-color: #e2dceb;
+    transform: translateY(-4px);
+}
+
+.playlist-card img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #eae6f0;
+    color: #666666;
+}

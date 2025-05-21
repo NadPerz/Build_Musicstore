@@ -1,0 +1,229 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+/*
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 1000px;
+    height: 90vh;
+    min-height: 400px;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}*/
+
+.container {
+    display: flex;
+    width: 80%; /* Reduced from 80% */
+    max-width: 700px; /* Optional: controls max width on larger screens */
+    border-radius: 16px;
+    background-color: #fff;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    min-height: 400px;
+}
+
+/* Optional: adjust .left padding */
+.left {
+    flex: 1;
+    padding: 15px 25px; /* Reduced horizontal padding */
+    box-sizing: border-box;
+}
+
+
+/* Left Side */
+.left {
+    flex: 1;
+    padding: 25px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.left h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.left p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* ensures label and input are aligned left */
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+/*
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+*/
+/* Reduced input width while keeping them centered and responsive */
+
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="tel"] {
+    width: 100%;
+    max-width: 360px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #A35C7A;
+    box-shadow: 0 0 5px rgba(163, 92, 122, 0.3);
+    outline: none;
+}
+
+.form-button {
+    margin-top: 10px;
+}
+
+.form-button input[type="submit"] {
+    background-color: #A35C7A;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+}
+
+
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+
+
+
+
+.signup-link {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+
+
+.signup-link a {
+    color: #A35C7A;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Right Side */
+.right {
+    flex: 1;
+    position: relative;
+    background-color: #222;
+    overflow: hidden;
+}
+
+.right img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.right::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.right-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.right-content h2 {
+    margin-bottom: 10px;
+    font-size: 1.4em;
+}
+
+.right-content p {
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+/* Responsive - Compact for smaller screens */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    .right {
+        height: 250px;
+    }
+
+    .right-content {
+        font-size: 0.9em;
+    }
+
+    body {
+        overflow: auto;
+    }
+}
