@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import db.DatabaseConnection;
+import exception.DatabaseException;
 
 public class PlaylistDAO {
     // No need to store connection as an instance variable when using singleton
@@ -13,7 +14,7 @@ public class PlaylistDAO {
         // No initialization needed as we'll get connection from singleton
     }
     
-    public void createPlaylist(String name, String username) throws SQLException {
+    public void createPlaylist(String name, String username) {
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
@@ -22,11 +23,14 @@ public class PlaylistDAO {
             stmt.setString(1, name);
             stmt.setString(2, username);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to create playlist: " + name, 
+                                      "INSERT", "playlists", e);
         }
         // We don't close the connection as it's managed by the singleton
     }
     
-    public List<Playlist> getAllPlaylists() throws SQLException {
+    public List<Playlist> getAllPlaylists() {
         List<Playlist> playlists = new ArrayList<>();
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -41,11 +45,14 @@ public class PlaylistDAO {
                     rs.getString("username")
                 ));
             }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to retrieve all playlists", 
+                                      "SELECT", "playlists", e);
         }
         return playlists;
     }
     
-    public Playlist getPlaylistById(int playlistId) throws SQLException {
+    public Playlist getPlaylistById(int playlistId) {
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
@@ -61,11 +68,14 @@ public class PlaylistDAO {
                     );
                 }
             }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to retrieve playlist with ID: " + playlistId, 
+                                      "SELECT", "playlists", e);
         }
         return null;
     }
     
-    public List<Song> getSongsInPlaylist(int playlistId) throws SQLException {
+    public List<Song> getSongsInPlaylist(int playlistId) {
         List<Song> songs = new ArrayList<>();
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -85,11 +95,14 @@ public class PlaylistDAO {
                     ));
                 }
             }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to retrieve songs for playlist ID: " + playlistId, 
+                                      "SELECT", "songs/playlist_songs", e);
         }
         return songs;
     }
     
-    public void addSongToPlaylist(int playlistId, int songId) throws SQLException {
+    public void addSongToPlaylist(int playlistId, int songId) {
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
@@ -98,10 +111,13 @@ public class PlaylistDAO {
             stmt.setInt(1, playlistId);
             stmt.setInt(2, songId);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to add song ID " + songId + " to playlist ID " + playlistId, 
+                                      "INSERT", "playlist_songs", e);
         }
     }
     
-    public void removeSongFromPlaylist(int playlistId, int songId) throws SQLException {
+    public void removeSongFromPlaylist(int playlistId, int songId) {
         // Get connection from singleton
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
@@ -110,6 +126,9 @@ public class PlaylistDAO {
             stmt.setInt(1, playlistId);
             stmt.setInt(2, songId);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to remove song ID " + songId + " from playlist ID " + playlistId, 
+                                      "DELETE", "playlist_songs", e);
         }
     }
 }

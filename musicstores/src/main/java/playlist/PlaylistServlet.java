@@ -4,15 +4,12 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.*;
 import java.util.List;
-import db.DatabaseConnection;
+import exception.DatabaseException;
 
 @WebServlet("/playlists")
 public class PlaylistServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
-    // Remove database connection constants since we'll use the singleton
     
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String playlistIdParam = request.getParameter("playlistId");
@@ -43,8 +40,22 @@ public class PlaylistServlet extends HttpServlet {
                 request.setAttribute("playlists", playlists);
                 request.getRequestDispatcher("index.jsp").forward(request, response);
             }
-        } catch (SQLException e) {
-            throw new ServletException("Database error: " + e.getMessage(), e);
+        } catch (DatabaseException e) {
+            // Log the detailed error message
+            System.err.println("Database error: " + e.getDetailedMessage());
+            e.printStackTrace();
+            
+            // Set user-friendly error message
+            request.setAttribute("error", "Unable to access playlist data. Please try again later.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            // Invalid playlist ID format
+            response.sendRedirect("playlists");
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            throw new ServletException("An unexpected error occurred", e);
         }
     }
     
@@ -61,6 +72,10 @@ public class PlaylistServlet extends HttpServlet {
                 
                 if (name != null && !name.trim().isEmpty() && username != null) {
                     playlistDAO.createPlaylist(name.trim(), username);
+                    // Set success message
+                    request.getSession().setAttribute("successMessage", "Playlist '" + name.trim() + "' created successfully!");
+                } else {
+                    request.getSession().setAttribute("errorMessage", "Invalid playlist name or user session.");
                 }
                 response.sendRedirect("playlists");
                 
@@ -69,6 +84,7 @@ public class PlaylistServlet extends HttpServlet {
                 int songId = Integer.parseInt(request.getParameter("songId"));
                 
                 playlistDAO.addSongToPlaylist(playlistId, songId);
+                request.getSession().setAttribute("successMessage", "Song added to playlist successfully!");
                 response.sendRedirect("playlists?playlistId=" + playlistId);
                 
             } else if ("removeSong".equals(action)) {
@@ -76,13 +92,36 @@ public class PlaylistServlet extends HttpServlet {
                 int songId = Integer.parseInt(request.getParameter("songId"));
                 
                 playlistDAO.removeSongFromPlaylist(playlistId, songId);
+                request.getSession().setAttribute("successMessage", "Song removed from playlist successfully!");
                 response.sendRedirect("playlists?playlistId=" + playlistId);
                 
             } else {
                 response.sendRedirect("index.jsp");
             }
-        } catch (SQLException e) {
-            throw new ServletException("Database error: " + e.getMessage(), e);
+        } catch (DatabaseException e) {
+            // Log the detailed error message
+            System.err.println("Database error: " + e.getDetailedMessage());
+            e.printStackTrace();
+            
+            // Set user-friendly error message in session
+            request.getSession().setAttribute("errorMessage", "Database operation failed. Please try again.");
+            
+            // Redirect back to appropriate page
+            String playlistIdParam = request.getParameter("playlistId");
+            if (playlistIdParam != null && !playlistIdParam.isEmpty()) {
+                response.sendRedirect("playlists?playlistId=" + playlistIdParam);
+            } else {
+                response.sendRedirect("playlists");
+            }
+        } catch (NumberFormatException e) {
+            // Invalid number format in parameters
+            request.getSession().setAttribute("errorMessage", "Invalid playlist or song ID.");
+            response.sendRedirect("playlists");
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            throw new ServletException("An unexpected error occurred", e);
         }
     }
 }
