@@ -9,29 +9,37 @@ public class DatabaseConnection {
     // Static variable to hold the single instance
     private static DatabaseConnection instance;
     
+    //db connection details 
+    
     private static final String URL = "jdbc:mysql://localhost:3306/musicstores";
     private static final String USER = "root";  
     private static final String PASSWORD = "Nadija@20022025";
+//    not recommended for production environments.
     
-    // Connection object
-    private Connection connection;
+    // Connection object  hold the actual java.sql.Connection  interact with the database.
+    private Connection connection; 
     
-    // Private constructor to prevent instantiation
+    
+    //Connection Management
+    // Private constructor to prevent instantiation This is the cornerstone of the Singleton pattern. By making the constructor private,
+    // prevent any other class from directly creating new instances of DatabaseConnection using new DatabaseConnection()
+    
+    
     private DatabaseConnection() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Load the JDBC driver
-            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            Class.forName("com.mysql.cj.jdbc.Driver"); // Load the JDBC driver jvm needs to load appropriate driver clz
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD); //DriverManager is a utility  establish a connection provided URL, username, and password.
             System.out.println("Database connection established successfully.");
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {  // MySQL JDBC driver class cannot be found (e.g., if the JAR file is missing
             String errorMsg = "MySQL JDBC Driver not found: " + e.getMessage();
             System.err.println(errorMsg);
-            throw new DatabaseException("Failed to load MySQL JDBC driver", 
+            throw new DatabaseException("Failed to load MySQL JDBC driver",       
                                       "DRIVER_LOAD", "N/A", e);
-        } catch (SQLException e) {
+        } catch (SQLException e) {  // SQL-related errors that occur during the connection attempt
             String errorMsg = "Database connection failed: " + e.getMessage();
             System.err.println(errorMsg);
-            throw new DatabaseException("Failed to establish database connection to: " + URL, 
-                                      "CONNECTION", "N/A", e);
+            throw new DatabaseException("Failed to establish database connection to: " + URL, //primary error message for the exception human-readable description dynamically including the URL 
+                                      "CONNECTION", "N/A", e); //value(use helpful catgeraization and logging), not applicable 
         }
     }
     
@@ -46,15 +54,15 @@ public class DatabaseConnection {
     // Method to get the connection
     public Connection getConnection() {
         try {
-            // Check if connection is still valid
+            // Check if connection is still valid (existing connection)
             if (connection == null || connection.isClosed()) {
                 System.out.println("Connection is closed, attempting to reconnect...");
-                reconnect();
+                reconnect(); //try to reconnect again when connection is loss
             }
             return connection;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to validate database connection", 
-                                      "CONNECTION_CHECK", "N/A", e);
+                                      "CONNECTION_CHECK", "N/A", e); //, wrong adding credentials, db not runing in this movemnet this claus will print 
         }
     }
     
