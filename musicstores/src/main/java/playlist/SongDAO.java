@@ -6,6 +6,8 @@ import java.util.List;
 import db.DatabaseConnection;
 import exception.DatabaseException;
 
+//Clear Method Naming
+
 public class SongDAO {
     // Default constructor - no parameters needed since we use singleton
     public SongDAO() {
@@ -13,13 +15,15 @@ public class SongDAO {
     }
     
     public void addSong(String title, String artist, String album, String filePath) {
-        // Get connection from singleton
+        
+    	// Get connection from singleton
+//    	DAO operations share the same database connection, which is efficient and prevents resource leaks.
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
         String sql = "INSERT INTO songs (title, artist, album, file_path) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, title);
-            stmt.setString(2, artist);
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) { //avoid SQL injection vulnerabilities PreparedStatement interface Statement
+            stmt.setString(1, title); //Resource Managemen , ResultSet objects ensures that these resources are automatically closed
+            stmt.setString(2, artist); // even if exceptions occur. This is a robust way to manage database resources.
             stmt.setString(3, album);
             stmt.setString(4, filePath);
             stmt.executeUpdate();
@@ -103,7 +107,7 @@ public class SongDAO {
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
         String sql = "DELETE FROM songs WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) { // PreparedStatement interface Statement
             stmt.setInt(1, songId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

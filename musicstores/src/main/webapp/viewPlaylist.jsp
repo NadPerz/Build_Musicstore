@@ -118,7 +118,7 @@ if (playlist == null) {
 
 <!-- Playlist Content -->
 <section class="playlist-section">
-    <h2>Playlist: <%= playlist.getName() %></h2>
+    <h2>Playlist: <%= playlist.getName() %></h2> <!--  Displays the name of the current playlist. -->
 
     <!-- Audio Player -->
     <div class="player-container">
@@ -209,7 +209,7 @@ if (playlist == null) {
         // Update the now playing text
         nowPlaying.textContent = `${title} - ${artist}`;
         
-        // Try multiple paths - adjust these based on your actual file system structure
+        // Try multiple paths - adjust these based on  actual file system structure
         const possiblePaths = [
             `uploads/${filename}`,
             `uploads/bohemian_rhapsody.mp3`,

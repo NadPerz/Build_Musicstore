@@ -39,6 +39,7 @@ public class RegistrationServlet extends HttpServlet {
             // Load the JDBC driver
 //            Class.forName("com.mysql.cj.jdbc.Driver");
             
+        	//insert to DB details user filled
         	
         	Class.forName("com.mysql.cj.jdbc.Driver");
 

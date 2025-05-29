@@ -15,7 +15,7 @@ public class PlaylistDAO {
     }
     
     public void createPlaylist(String name, String username) {
-        // Get connection from singleton
+        // Get connection from singleton It leverages a singleton pattern
         Connection conn = DatabaseConnection.getInstance().getConnection();
         
         String sql = "INSERT INTO playlists (name, username, created_at) VALUES (?, ?, NOW())";

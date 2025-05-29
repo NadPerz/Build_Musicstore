@@ -3,8 +3,8 @@
 <%@ page import="java.util.List" %>
 <%@ page session="true" %>
 <%
-    if (session.getAttribute("name") == null) {
-        response.sendRedirect("login.jsp");
+    if (session.getAttribute("name") == null) {//name will get when log
+        response.sendRedirect("login.jsp"); // jsp web implicit
     }
     String username = (String)session.getAttribute("name");
 %>

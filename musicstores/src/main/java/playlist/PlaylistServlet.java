@@ -7,21 +7,23 @@ import java.io.IOException;
 import java.util.List;
 import exception.DatabaseException;
 
-@WebServlet("/playlists")
+@WebServlet("/playlists") //ser navigates to your-app-url/playlists, this servlet will handle the request.
 public class PlaylistServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
+    //typically used to retrieve data from the server HTTP GET  viewing a playlist
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String playlistIdParam = request.getParameter("playlistId");
         
         try {
             // Create DAO instances using default constructors (no connection needed)
+        	//abstract the underlying database operations.
             PlaylistDAO playlistDAO = new PlaylistDAO();
             SongDAO songDAO = new SongDAO();
             
             if (playlistIdParam != null) {
                 int playlistId = Integer.parseInt(playlistIdParam);
-                Playlist playlist = playlistDAO.getPlaylistById(playlistId);
+                Playlist playlist = playlistDAO.getPlaylistById(playlistId); //retrieves the songs
                 
                 if (playlist != null) {
                     List<Song> songs = playlistDAO.getSongsInPlaylist(playlistId);
@@ -29,7 +31,10 @@ public class PlaylistServlet extends HttpServlet {
                     
                     request.setAttribute("playlist", playlist);
                     request.setAttribute("songs", songs);
-                    request.setAttribute("allSongs", allSongs);
+                    request.setAttribute("allSongs", allSongs); //fetches allSongs
+                    
+//   sets these playlist, songs, and allSongs objects as attributes in the request scope and forwards the request toviewPlaylist.jsp        
+//                    viewPlaylist.jsp will render the details of the selected playlist.
                     request.getRequestDispatcher("viewPlaylist.jsp").forward(request, response);
                 } else {
                     // Playlist ID is invalid
@@ -59,6 +64,7 @@ public class PlaylistServlet extends HttpServlet {
         }
     }
     
+    // create or modify resources 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         
@@ -67,12 +73,13 @@ public class PlaylistServlet extends HttpServlet {
             PlaylistDAO playlistDAO = new PlaylistDAO();
             
             if ("create".equals(action)) {
-                String name = request.getParameter("playlistName");  // make sure this matches the form input name
+                String name = request.getParameter("playlistName"); //Reads the playlistName from the request and the username from the session.
                 String username = (String) request.getSession().getAttribute("name");
                 
                 if (name != null && !name.trim().isEmpty() && username != null) {
                     playlistDAO.createPlaylist(name.trim(), username);
                     // Set success message
+                    //Sets a success message and redirects back to the individual playlist view
                     request.getSession().setAttribute("successMessage", "Playlist '" + name.trim() + "' created successfully!");
                 } else {
                     request.getSession().setAttribute("errorMessage", "Invalid playlist name or user session.");
@@ -87,6 +94,8 @@ public class PlaylistServlet extends HttpServlet {
                 request.getSession().setAttribute("successMessage", "Song added to playlist successfully!");
                 response.sendRedirect("playlists?playlistId=" + playlistId);
                 
+                
+                //remove a song from a playlist.
             } else if ("removeSong".equals(action)) {
                 int playlistId = Integer.parseInt(request.getParameter("playlistId"));
                 int songId = Integer.parseInt(request.getParameter("songId"));
